@@ -193,7 +193,9 @@ class TestApply(unittest.TestCase):
             root = temp_path / "root"
             root.mkdir()
             outside_file = temp_path / "outside.txt"
-            edits = [EditBlock(path=str(outside_file), original="", updated="escaped\n")]
+            edits = [
+                EditBlock(path=str(outside_file), original="", updated="escaped\n")
+            ]
 
             with self.assertRaises(PathEscapeError):
                 apply_edits(edits, root=root)
