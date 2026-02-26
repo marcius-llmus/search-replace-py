@@ -74,7 +74,9 @@ def strip_filename(filename: str, fence: Fence) -> str | None:
     return filename
 
 
-def find_filename(lines: list[str], fence: Fence, valid_fnames: Sequence[str] | None) -> str | None:
+def find_filename(
+    lines: list[str], fence: Fence, valid_fnames: Sequence[str] | None
+) -> str | None:
     """
     Deepseek Coder v2 has been doing this:
 
@@ -157,13 +159,17 @@ def find_original_update_blocks(
                 if i + 1 < len(lines) and divider_pattern.match(lines[i + 1].strip()):
                     filename = find_filename(lines[max(0, i - 3) : i], fence, None)
                 else:
-                    filename = find_filename(lines[max(0, i - 3) : i], fence, valid_fnames)
+                    filename = find_filename(
+                        lines[max(0, i - 3) : i], fence, valid_fnames
+                    )
 
                 if not filename:
                     if current_filename:
                         filename = current_filename
                     else:
-                        raise MissingFilenameError(missing_filename_err.format(fence=fence))
+                        raise MissingFilenameError(
+                            missing_filename_err.format(fence=fence)
+                        )
 
                 current_filename = filename
 
@@ -186,7 +192,8 @@ def find_original_update_blocks(
                     i += 1
 
                 if i >= len(lines) or not (
-                    updated_pattern.match(lines[i].strip()) or divider_pattern.match(lines[i].strip())
+                    updated_pattern.match(lines[i].strip())
+                    or divider_pattern.match(lines[i].strip())
                 ):
                     raise ParseError(f"Expected `{UPDATED_ERR}` or `{DIVIDER_ERR}`")
 
@@ -206,6 +213,8 @@ def parse_edit_blocks(
 ) -> ParseResult:
     edits = [
         EditBlock(path=block[0], original=block[1], updated=block[2])
-        for block in find_original_update_blocks(content, fence=fence, valid_fnames=valid_fnames)
+        for block in find_original_update_blocks(
+            content, fence=fence, valid_fnames=valid_fnames
+        )
     ]
     return ParseResult(edits=edits)

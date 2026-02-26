@@ -13,10 +13,10 @@ from search_replace.errors import ApplyError
 
 class TestApply(unittest.TestCase):
     def test_strip_quoted_wrapping(self) -> None:
-        input_text = (
-            "filename.ext\n```\nWe just want this content\nNot the filename and triple quotes\n```"
+        input_text = "filename.ext\n```\nWe just want this content\nNot the filename and triple quotes\n```"
+        expected_output = (
+            "We just want this content\nNot the filename and triple quotes\n"
         )
-        expected_output = "We just want this content\nNot the filename and triple quotes\n"
         result = strip_quoted_wrapping(input_text, "filename.ext")
         self.assertEqual(result, expected_output)
 
@@ -82,7 +82,9 @@ class TestApply(unittest.TestCase):
         result = replace_most_similar_chunk(whole, part, replace)
         self.assertEqual(result, expected_output)
 
-    def test_replace_part_with_missing_leading_whitespace_including_blank_line(self) -> None:
+    def test_replace_part_with_missing_leading_whitespace_including_blank_line(
+        self,
+    ) -> None:
         whole = "    line1\n    line2\n    line3\n"
         part = "\n  line1\n  line2\n"
         replace = "  new_line1\n  new_line2\n"
@@ -129,7 +131,9 @@ class TestApply(unittest.TestCase):
             root = Path(tmp_dir)
             (root / "file.txt").write_text("one\ntwo\nthree\n", encoding="utf-8")
 
-            edits = [EditBlock(path="file.txt", original="does-not-exist\n", updated="new\n")]
+            edits = [
+                EditBlock(path="file.txt", original="does-not-exist\n", updated="new\n")
+            ]
 
             with self.assertRaises(ApplyError):
                 apply_edits(edits, root=root, dry_run=True)
@@ -176,7 +180,9 @@ class TestApply(unittest.TestCase):
             file1 = root / "file.txt"
             file1.write_text("one\ntwo\nthree\n", encoding="utf-8")
 
-            edits = [EditBlock(path="file.txt", original="does-not-exist\n", updated="new\n")]
+            edits = [
+                EditBlock(path="file.txt", original="does-not-exist\n", updated="new\n")
+            ]
 
             with self.assertRaises(ApplyError) as ctx:
                 _ = apply_edits(edits, root=root, chat_files=["file.txt"])

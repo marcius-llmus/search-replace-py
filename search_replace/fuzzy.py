@@ -20,8 +20,8 @@ def replace_closest_edit_distance(
 
     for length in range(min_len, max_len):
         for i in range(len(whole_lines) - length + 1):
-            chunk = whole_lines[i : i + length]
-            chunk = "".join(chunk)
+            chunk_lines = whole_lines[i : i + length]
+            chunk = "".join(chunk_lines)
 
             similarity = SequenceMatcher(None, chunk, part).ratio()
 
@@ -41,7 +41,9 @@ def replace_closest_edit_distance(
     return "".join(modified_whole)
 
 
-def find_similar_lines(search_lines: str, content_lines: str, threshold: float = 0.6) -> str:
+def find_similar_lines(
+    search_lines: str, content_lines: str, threshold: float = 0.6
+) -> str:
     search_lines_list = search_lines.splitlines()
     content_lines_list = content_lines.splitlines()
 
@@ -69,7 +71,9 @@ def find_similar_lines(search_lines: str, content_lines: str, threshold: float =
         return "\n".join(best_match)
 
     context_lines = 5
-    best_match_end = min(len(content_lines_list), best_match_i + len(search_lines_list) + context_lines)
+    best_match_end = min(
+        len(content_lines_list), best_match_i + len(search_lines_list) + context_lines
+    )
     best_match_i = max(0, best_match_i - context_lines)
 
     best = content_lines_list[best_match_i:best_match_end]

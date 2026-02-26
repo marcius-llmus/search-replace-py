@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import TypeAlias
 
-
 Fence: TypeAlias = tuple[str, str]
 DEFAULT_FENCE: Fence = ("`" * 3, "`" * 3)
 

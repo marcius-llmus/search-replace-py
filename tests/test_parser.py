@@ -1,7 +1,6 @@
 import unittest
 
-from search_replace import DEFAULT_FENCE
-from search_replace.parser import find_filename, find_original_update_blocks, parse_edit_blocks
+from search_replace.parser import find_filename, find_original_update_blocks
 
 
 class TestParser(unittest.TestCase):
@@ -28,7 +27,9 @@ class TestParser(unittest.TestCase):
         self.assertEqual(find_filename(lines, fence, valid_fnames), "file1.py")
 
         lines = [r"\windows__init__.py", "```"]
-        self.assertEqual(find_filename(lines, fence, valid_fnames), r"\windows\__init__.py")
+        self.assertEqual(
+            find_filename(lines, fence, valid_fnames), r"\windows\__init__.py"
+        )
 
     def test_find_original_update_blocks(self) -> None:
         edit = """

@@ -26,21 +26,27 @@ def perfect_or_whitespace(
         return result
 
     # Try being flexible about leading whitespace.
-    result = replace_part_with_missing_leading_whitespace(whole_lines, part_lines, replace_lines)
+    result = replace_part_with_missing_leading_whitespace(
+        whole_lines, part_lines, replace_lines
+    )
     if result:
         return result
 
     return None
 
 
-def perfect_replace(whole_lines: list[str], part_lines: list[str], replace_lines: list[str]) -> str | None:
+def perfect_replace(
+    whole_lines: list[str], part_lines: list[str], replace_lines: list[str]
+) -> str | None:
     part_tup = tuple(part_lines)
     part_len = len(part_lines)
 
     for index in range(len(whole_lines) - part_len + 1):
         whole_tup = tuple(whole_lines[index : index + part_len])
         if part_tup == whole_tup:
-            result = whole_lines[:index] + replace_lines + whole_lines[index + part_len :]
+            result = (
+                whole_lines[:index] + replace_lines + whole_lines[index + part_len :]
+            )
             return "".join(result)
 
     return None
@@ -59,7 +65,9 @@ def replace_most_similar_chunk(whole: str, part: str, replace: str) -> str | Non
     # Drop leading empty line, GPT sometimes adds them spuriously (issue #25).
     if len(part_lines) > 2 and not part_lines[0].strip():
         skip_blank_line_part_lines = part_lines[1:]
-        result = perfect_or_whitespace(whole_lines, skip_blank_line_part_lines, replace_lines)
+        result = perfect_or_whitespace(
+            whole_lines, skip_blank_line_part_lines, replace_lines
+        )
         if result:
             return result
 
@@ -103,7 +111,9 @@ def try_dotdotdots(whole: str, part: str, replace: str) -> str | None:
         return None
 
     # Compare odd strings in part_pieces and replace_pieces.
-    all_dots_match = all(part_pieces[i] == replace_pieces[i] for i in range(1, len(part_pieces), 2))
+    all_dots_match = all(
+        part_pieces[i] == replace_pieces[i] for i in range(1, len(part_pieces), 2)
+    )
     if not all_dots_match:
         raise ValueError("Unmatched ... in SEARCH/REPLACE block")
 
@@ -141,14 +151,15 @@ def replace_part_with_missing_leading_whitespace(
     # Either omitting all leading whitespace, or including only some of it.
 
     # Outdent everything in part_lines and replace_lines by the max fixed amount possible.
-    leading = [len(p) - len(p.lstrip()) for p in part_lines if p.strip()] + [
+    leading: list[int] = [len(p) - len(p.lstrip()) for p in part_lines if p.strip()] + [
         len(p) - len(p.lstrip()) for p in replace_lines if p.strip()
     ]
 
-    if leading and min(leading):
+    if leading:
         num_leading = min(leading)
-        part_lines = [p[num_leading:] if p.strip() else p for p in part_lines]
-        replace_lines = [p[num_leading:] if p.strip() else p for p in replace_lines]
+        if num_leading:
+            part_lines = [p[num_leading:] if p.strip() else p for p in part_lines]
+            replace_lines = [p[num_leading:] if p.strip() else p for p in replace_lines]
 
     # Can we find an exact match not including the leading whitespace.
     num_part_lines = len(part_lines)
@@ -161,14 +172,20 @@ def replace_part_with_missing_leading_whitespace(
         if add_leading is None:
             continue
 
-        replace_lines = [add_leading + line if line.strip() else line for line in replace_lines]
-        whole_lines = whole_lines[:index] + replace_lines + whole_lines[index + num_part_lines :]
+        replace_lines = [
+            add_leading + line if line.strip() else line for line in replace_lines
+        ]
+        whole_lines = (
+            whole_lines[:index] + replace_lines + whole_lines[index + num_part_lines :]
+        )
         return "".join(whole_lines)
 
     return None
 
 
-def match_but_for_leading_whitespace(whole_lines: list[str], part_lines: list[str]) -> str | None:
+def match_but_for_leading_whitespace(
+    whole_lines: list[str], part_lines: list[str]
+) -> str | None:
     num = len(whole_lines)
 
     # Does the non-whitespace all agree?
@@ -187,7 +204,9 @@ def match_but_for_leading_whitespace(whole_lines: list[str], part_lines: list[st
     return add.pop()
 
 
-def strip_quoted_wrapping(res: str, fname: str | None = None, fence: Fence = DEFAULT_FENCE) -> str:
+def strip_quoted_wrapping(
+    res: str, fname: str | None = None, fence: Fence = DEFAULT_FENCE
+) -> str:
     """
     Given an input string which may have extra "wrapping" around it, remove the wrapping.
     For example:
@@ -206,7 +225,11 @@ def strip_quoted_wrapping(res: str, fname: str | None = None, fence: Fence = DEF
     if fname and res_lines[0].strip().endswith(Path(fname).name):
         res_lines = res_lines[1:]
 
-    if res_lines and res_lines[0].startswith(fence[0]) and res_lines[-1].startswith(fence[1]):
+    if (
+        res_lines
+        and res_lines[0].startswith(fence[0])
+        and res_lines[-1].startswith(fence[1])
+    ):
         res_lines = res_lines[1:-1]
 
     result = "\n".join(res_lines)
@@ -236,6 +259,7 @@ def do_replace(
     if content is None:
         return None
 
+    new_content: str | None
     if not before_text.strip():
         # Append to existing file, or start a new file.
         new_content = content + after_text
@@ -243,7 +267,6 @@ def do_replace(
         new_content = replace_most_similar_chunk(content, before_text, after_text)
 
     return new_content
-
 
 
 def apply_edits(
@@ -280,7 +303,9 @@ def apply_edits(
             # Try patching any of the other files in the chat.
             for candidate_file in fallback_files:
                 content = candidate_file.read_text(encoding="utf-8")
-                new_content = do_replace(candidate_file, content, original, updated, fence)
+                new_content = do_replace(
+                    candidate_file, content, original, updated, fence
+                )
                 if new_content:
                     path = _make_relative(candidate_file, root_path)
                     full_path = candidate_file
@@ -349,7 +374,9 @@ Don't re-send them.
 Just reply with fixed versions of the {blocks} above that failed to match.
 """
 
-    raise ApplyError(message=result, failed=failed, passed=passed, updated_edits=updated_edits)
+    raise ApplyError(
+        message=result, failed=failed, passed=passed, updated_edits=updated_edits
+    )
 
 
 def _resolve_path(root_path: Path, path: str | Path) -> Path:
