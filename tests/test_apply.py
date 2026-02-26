@@ -5,7 +5,6 @@ from pathlib import Path
 from search_replace import EditBlock
 from search_replace.apply import (
     apply_edits,
-    apply_edits_dry_run,
     replace_most_similar_chunk,
     strip_quoted_wrapping,
 )
@@ -113,7 +112,7 @@ class TestApply(unittest.TestCase):
             new_file_content = (root / "newfile.txt").read_text(encoding="utf-8")
             self.assertEqual(new_file_content, "creating a new file\n")
 
-    def test_full_edit_dry_run(self) -> None:
+    def test_dry_run_does_not_write(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             file1 = root / "file.txt"
@@ -121,10 +120,55 @@ class TestApply(unittest.TestCase):
             file1.write_text(original_content, encoding="utf-8")
 
             edits = [EditBlock(path="file.txt", original="two\n", updated="new\n")]
-            _ = apply_edits_dry_run(edits, root=root, chat_files=["file.txt"])
+            apply_edits(edits, root=root, dry_run=True)
 
-            content = file1.read_text(encoding="utf-8")
-            self.assertEqual(content, original_content)
+            self.assertEqual(file1.read_text(encoding="utf-8"), original_content)
+
+    def test_dry_run_raises_on_failed_block(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "file.txt").write_text("one\ntwo\nthree\n", encoding="utf-8")
+
+            edits = [EditBlock(path="file.txt", original="does-not-exist\n", updated="new\n")]
+
+            with self.assertRaises(ApplyError):
+                apply_edits(edits, root=root, dry_run=True)
+
+    def test_dry_run_raises_before_any_write_on_partial_failure(self) -> None:
+        """Blocks that would match must NOT be written when a later block fails."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            file1 = root / "file.txt"
+            original_content = "one\ntwo\nthree\n"
+            file1.write_text(original_content, encoding="utf-8")
+
+            edits = [
+                EditBlock(path="file.txt", original="two\n", updated="TWO\n"),
+                EditBlock(path="file.txt", original="does-not-exist\n", updated="x\n"),
+            ]
+
+            with self.assertRaises(ApplyError):
+                apply_edits(edits, root=root, dry_run=True)
+
+            self.assertEqual(file1.read_text(encoding="utf-8"), original_content)
+
+    def test_dry_run_error_message_says_would_apply(self) -> None:
+        """The error message uses 'would apply' language, not 'were applied'."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            (root / "file.txt").write_text("one\ntwo\nthree\n", encoding="utf-8")
+
+            edits = [
+                EditBlock(path="file.txt", original="two\n", updated="TWO\n"),
+                EditBlock(path="file.txt", original="does-not-exist\n", updated="x\n"),
+            ]
+
+            with self.assertRaises(ApplyError) as ctx:
+                apply_edits(edits, root=root, dry_run=True)
+
+            text = str(ctx.exception)
+            self.assertIn("would apply successfully", text)
+            self.assertNotIn("were applied successfully", text)
 
     def test_failed_apply_reports_exact_message_shape(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

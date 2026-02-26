@@ -126,34 +126,6 @@ Tooooo
         edits = list(find_original_update_blocks(edit, fence=quad_backticks))
         self.assertEqual(edits, [("foo.txt", "", "Tooooo\n")])
 
-    def test_find_original_update_blocks_shell_block(self) -> None:
-        content = """
-```bash
-echo "hello"
-echo "world"
-```
-"""
-        blocks = list(find_original_update_blocks(content))
-        self.assertEqual(blocks, [(None, 'echo "hello"\necho "world"\n')])
-
-    def test_parse_edit_blocks_extracts_shell_commands(self) -> None:
-        content = """
-```bash
-echo one
-```
-
-foo.py
-<<<<<<< SEARCH
-one
-=======
-two
->>>>>>> REPLACE
-"""
-        result = parse_edit_blocks(content, fence=DEFAULT_FENCE)
-        self.assertEqual(result.shell_commands, ["echo one\n"])
-        self.assertEqual(len(result.edits), 1)
-        self.assertEqual(result.edits[0].path, "foo.py")
-
     def test_find_original_update_blocks_quote_below_filename(self) -> None:
         edit = """
 Here's the change:
@@ -261,8 +233,7 @@ Hope you like it!
         )
 
     def test_find_original_update_blocks_with_sh_language_identifier(self) -> None:
-        # `sh` is in shell_starts, but if next line after fence is a SEARCH marker (within 2 lines)
-        # it should still be parsed as a SEARCH/REPLACE block, not a shell block.
+        # `sh` as a language identifier should be treated as a regular edit block.
         edit = """
 Here's a shell script:
 

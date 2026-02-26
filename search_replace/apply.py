@@ -4,6 +4,7 @@ from typing import Sequence
 
 from .errors import ApplyError
 from .fuzzy import find_similar_lines, replace_closest_edit_distance
+from .parser import parse_edit_blocks
 from .types import DEFAULT_FENCE, ApplyResult, EditBlock, Fence
 
 
@@ -244,14 +245,6 @@ def do_replace(
     return new_content
 
 
-def apply_edits_dry_run(
-    edits: Sequence[EditBlock],
-    root: str | Path,
-    chat_files: Sequence[str | Path] | None = None,
-    fence: Fence = DEFAULT_FENCE,
-) -> ApplyResult:
-    return apply_edits(edits, root=root, chat_files=chat_files, fence=fence, dry_run=True)
-
 
 def apply_edits(
     edits: Sequence[EditBlock],
@@ -303,9 +296,6 @@ def apply_edits(
         else:
             failed.append(edit)
 
-    if dry_run:
-        return ApplyResult(updated_edits=updated_edits)
-
     if not failed:
         return ApplyResult(updated_edits=updated_edits)
 
@@ -348,7 +338,12 @@ The REPLACE lines are already in {path}!
     )
     if passed:
         passed_blocks = "block" if len(passed) == 1 else "blocks"
-        result += f"""
+        if dry_run:
+            result += f"""
+# The other {len(passed)} SEARCH/REPLACE {passed_blocks} would apply successfully.
+"""
+        else:
+            result += f"""
 # The other {len(passed)} SEARCH/REPLACE {passed_blocks} were applied successfully.
 Don't re-send them.
 Just reply with fixed versions of the {blocks} above that failed to match.
@@ -382,3 +377,19 @@ def _make_relative(path: Path, root_path: Path) -> str:
         return str(path.relative_to(root_path))
     except ValueError:
         return str(path)
+
+
+def apply_diff(
+    llm_response: str,
+    root: str | Path,
+    chat_files: Sequence[str | Path] | None = None,
+    fence: Fence = DEFAULT_FENCE,
+) -> ApplyResult:
+    """Parse SEARCH/REPLACE blocks from an LLM response and apply them to disk.
+
+    Convenience wrapper around ``parse_edit_blocks`` + ``apply_edits``.
+    Raises ``ParseError`` if the response contains no valid blocks or has
+    malformed syntax, and ``ApplyError`` if one or more blocks fail to match.
+    """
+    result = parse_edit_blocks(llm_response, fence=fence)
+    return apply_edits(result.edits, root=root, chat_files=chat_files, fence=fence)

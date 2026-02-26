@@ -43,16 +43,11 @@ def process_markdown(filename: str, fh: io.StringIO) -> None:
             print("\n\n@@@", header, "@" * 20, file=fh, flush=True)
 
         for block in blocks:
-            if block[0] is None:
-                print("@@@ SHELL", "@" * 20, file=fh, flush=True)
-                print(block[1], end="", file=fh, flush=True)
-                print("@@@ ENDSHELL", "@" * 20, file=fh, flush=True)
-            else:
-                print("@@@ SEARCH:", block[0], "@" * 20, file=fh, flush=True)
-                print(block[1], end="", file=fh, flush=True)
-                print("@" * 20, file=fh, flush=True)
-                print(block[2], end="", file=fh, flush=True)
-                print("@@@ REPLACE", "@" * 20, file=fh, flush=True)
+            print("@@@ SEARCH:", block[0], "@" * 20, file=fh, flush=True)
+            print(block[1], end="", file=fh, flush=True)
+            print("@" * 20, file=fh, flush=True)
+            print(block[2], end="", file=fh, flush=True)
+            print("@@@ REPLACE", "@" * 20, file=fh, flush=True)
 
 
 class TestParityHarness(unittest.TestCase):

@@ -3166,12 +3166,6 @@ class RepoMap:
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
 
 
-@@@ #### how would send_prompt_to_client work if this was all running inside a flask server, providing an api to web clients? @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install flask-socketio
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
 @@@ #### make that change @@@@@@@@@@@@@@@@@@@@
 @@@ SEARCH: aider/sendchat.py @@@@@@@@@@@@@@@@@@@@
     def wrapper(*args, **kwargs):
@@ -25202,39 +25196,6 @@ class Commands:
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
 
 
-@@@ #### how do i install pandas @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install --upgrade pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### how do i install pandas @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### how do i install pandas @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### how do i install pandas @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### how do i install pandas @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pip install pandas
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
 @@@ #### in cleanup, ignore recursion errors too @@@@@@@@@@@@@@@@@@@@
 @@@ SEARCH: aider/utils.py @@@@@@@@@@@@@@@@@@@@
     def cleanup(self):
@@ -25521,21 +25482,6 @@ from aider.main import check_gitignore, main, setup_git
 from aider.utils import GitTemporaryDirectory, IgnorantTemporaryDirectory, make_repo
 from aider.coders import Coder
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### how do i run that test @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_main.TestMain.test_return_coder
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_main.TestMain
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_main
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-pytest tests/basic/test_main.py::TestMain::test_return_coder
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### add a --map-multiplier-no-files switch that defaults to 2 @@@@@@@@@@@@@@@@@@@@
@@ -26471,9 +26417,6 @@ from prompt_toolkit.validation import Validator
         if self.verbose:
             self.io.tool_output(f"RepoMap initialized with map_mul_no_files: {self.map_mul_no_files}")
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests/basic/test_main.py
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### the main prompt sometimes shows 1 file right before the >, and shows multiple files on the line before. always show on line before, even 1 file @@@@@@@@@@@@@@@@@@@@
@@ -26691,18 +26634,6 @@ python -m unittest tests/basic/test_main.py
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
 
 
-@@@ #### cmd to run those? @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_commands.TestCommands.test_cmd_reset
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_commands.TestCommands
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest discover tests
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
 @@@ #### confirm_ask should take a explicit_yes_required param, default False. if True, then self.yes==True means the answer is no @@@@@@@@@@@@@@@@@@@@
 @@@ SEARCH: aider/io.py @@@@@@@@@@@@@@@@@@@@
     def confirm_ask(self, question, default="y", subject=None):
@@ -26895,12 +26826,6 @@ if __name__ == "__main__":
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
 
 
-@@@ #### run it @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests/basic/test_io.py
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-
-
 @@@ #### run main() with --apply shell.md --yes and in shell.md include a ```bash block that does `touch file.txt` --> make sure it does NOT create file.txt since shell commands require explicit yes, not --yes @@@@@@@@@@@@@@@@@@@@
 @@@ SEARCH: tests/basic/test_main.py @@@@@@@@@@@@@@@@@@@@
 from aider.main import check_gitignore, main, setup_git
@@ -27090,15 +27015,6 @@ from aider.main import ApplyShellCommandsError, check_gitignore, main, setup_git
 @@@@@@@@@@@@@@@@@@@@
 from aider.main import check_gitignore, main, setup_git
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-
-
-@@@ #### run that test @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest tests.basic.test_main.TestMain.test_apply_shell_commands
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python -m unittest -v tests.basic.test_main.TestMain.test_apply_shell_commands
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### do that @@@@@@@@@@@@@@@@@@@@
@@ -27371,9 +27287,6 @@ if __name__ == "__main__":
     else:
         process_markdown(sys.argv[1])
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-python testsr.py your_markdown_file.md
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### use indent=4 on all json.dump @@@@@@@@@@@@@@@@@@@@
@@ -27471,12 +27384,6 @@ import json
 import re
 import sys
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-chmod +x testsr.py
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-./testsr.py your_markdown_file.md
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### if section.strip() -> if not/continue @@@@@@@@@@@@@@@@@@@@
@@ -27796,9 +27703,6 @@ EOF
 
 echo "$message"
 @@@ REPLACE @@@@@@@@@@@@@@@@@@@@
-@@@ SHELL @@@@@@@@@@@@@@@@@@@@
-bash example.sh
-@@@ ENDSHELL @@@@@@@@@@@@@@@@@@@@
 
 
 @@@ #### make the change from https://github.com/paul-gauthier/aider/issues/1158 @@@@@@@@@@@@@@@@@@@@

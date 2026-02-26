@@ -1,11 +1,5 @@
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import TypeAlias
-
-
-class BlockKind(StrEnum):
-    SEARCH_REPLACE = "search_replace"
-    SHELL = "shell"
 
 
 Fence: TypeAlias = tuple[str, str]
@@ -22,7 +16,6 @@ class EditBlock:
 @dataclass(frozen=True, slots=True)
 class ParseResult:
     edits: list[EditBlock]
-    shell_commands: list[str]
 
 
 @dataclass(frozen=True, slots=True)

@@ -42,8 +42,6 @@ missing_filename_err = (
 triple_backticks = "`" * 3
 
 ParsedEditBlock: TypeAlias = tuple[str, str, str]
-ParsedShellCommandBlock: TypeAlias = tuple[None, str]
-ParsedBlock: TypeAlias = ParsedEditBlock | ParsedShellCommandBlock
 
 
 def strip_filename(filename: str, fence: Fence) -> str | None:
@@ -141,7 +139,7 @@ def find_original_update_blocks(
     content: str,
     fence: Fence = DEFAULT_FENCE,
     valid_fnames: Sequence[str] | None = None,
-) -> Iterator[ParsedBlock]:
+) -> Iterator[ParsedEditBlock]:
     lines = content.splitlines(keepends=True)
     i = 0
     current_filename: str | None = None
@@ -152,40 +150,6 @@ def find_original_update_blocks(
 
     while i < len(lines):
         line = lines[i]
-
-        shell_starts = [
-            "```bash",
-            "```sh",
-            "```shell",
-            "```cmd",
-            "```batch",
-            "```powershell",
-            "```ps1",
-            "```zsh",
-            "```fish",
-            "```ksh",
-            "```csh",
-            "```tcsh",
-        ]
-
-        next_is_editblock = (
-            i + 1 < len(lines)
-            and head_pattern.match(lines[i + 1].strip())
-            or i + 2 < len(lines)
-            and head_pattern.match(lines[i + 2].strip())
-        )
-
-        if any(line.strip().startswith(start) for start in shell_starts) and not next_is_editblock:
-            shell_content = []
-            i += 1
-            while i < len(lines) and not lines[i].strip().startswith("```"):
-                shell_content.append(lines[i])
-                i += 1
-            if i < len(lines) and lines[i].strip().startswith("```"):
-                i += 1
-
-            yield None, "".join(shell_content)
-            continue
 
         if head_pattern.match(line.strip()):
             try:
@@ -240,15 +204,8 @@ def parse_edit_blocks(
     fence: Fence = DEFAULT_FENCE,
     valid_fnames: Sequence[str] | None = None,
 ) -> ParseResult:
-    edits: list[EditBlock] = []
-    shell_commands: list[str] = []
-
-    for block in find_original_update_blocks(content, fence=fence, valid_fnames=valid_fnames):
-        if block[0] is None:
-            shell_commands.append(block[1])
-            continue
-
-        edit = EditBlock(path=block[0], original=block[1], updated=block[2])
-        edits.append(edit)
-
-    return ParseResult(edits=edits, shell_commands=shell_commands)
+    edits = [
+        EditBlock(path=block[0], original=block[1], updated=block[2])
+        for block in find_original_update_blocks(content, fence=fence, valid_fnames=valid_fnames)
+    ]
+    return ParseResult(edits=edits)
