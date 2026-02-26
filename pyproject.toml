@@ -1,0 +1,7 @@
+[project]
+name = "search-replace-py"
+version = "0.1.0"
+description = "A search replace algo based on Aider search replace"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
