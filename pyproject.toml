@@ -5,3 +5,8 @@ description = "A search replace algo based on Aider search replace"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
