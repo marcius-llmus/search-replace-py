@@ -8,7 +8,7 @@ from search_replace.apply import (
     replace_most_similar_chunk,
     strip_quoted_wrapping,
 )
-from search_replace.errors import ApplyError
+from search_replace.errors import ApplyError, PathEscapeError
 
 
 class TestApply(unittest.TestCase):
@@ -173,6 +173,43 @@ class TestApply(unittest.TestCase):
             text = str(ctx.exception)
             self.assertIn("would apply successfully", text)
             self.assertNotIn("were applied successfully", text)
+
+    def test_rejects_relative_path_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_path = Path(tmp_dir)
+            root = temp_path / "root"
+            root.mkdir()
+            outside_file = temp_path / "outside.txt"
+            edits = [EditBlock(path="../outside.txt", original="", updated="escaped\n")]
+
+            with self.assertRaises(PathEscapeError):
+                apply_edits(edits, root=root)
+
+            self.assertFalse(outside_file.exists())
+
+    def test_rejects_absolute_path_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_path = Path(tmp_dir)
+            root = temp_path / "root"
+            root.mkdir()
+            outside_file = temp_path / "outside.txt"
+            edits = [EditBlock(path=str(outside_file), original="", updated="escaped\n")]
+
+            with self.assertRaises(PathEscapeError):
+                apply_edits(edits, root=root)
+
+            self.assertFalse(outside_file.exists())
+
+    def test_allows_absolute_path_within_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            inside_file = root / "inside.txt"
+            edits = [EditBlock(path=str(inside_file), original="", updated="created\n")]
+
+            result = apply_edits(edits, root=root)
+
+            self.assertEqual(len(result.updated_edits), 1)
+            self.assertEqual(inside_file.read_text(encoding="utf-8"), "created\n")
 
     def test_failed_apply_reports_exact_message_shape(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -1,5 +1,11 @@
 from .apply import apply_diff, apply_edits
-from .errors import ApplyError, MissingFilenameError, ParseError, SearchReplaceError
+from .errors import (
+    ApplyError,
+    MissingFilenameError,
+    ParseError,
+    PathEscapeError,
+    SearchReplaceError,
+)
 from .parser import all_fences, find_original_update_blocks, parse_edit_blocks
 from .prompts import (
     EditBlockFencedPrompts,
@@ -25,6 +31,7 @@ __all__ = [
     "MissingFilenameError",
     "parse_edit_blocks",
     "ParseError",
+    "PathEscapeError",
     "ParseResult",
     "render_system_prompt",
     "SearchReplaceError",

@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Sequence
 
-from .errors import ApplyError, ParseError
+from .errors import ApplyError, ParseError, PathEscapeError
 from .fuzzy import find_similar_lines, replace_closest_edit_distance
 from .parser import parse_edit_blocks
 from .types import DEFAULT_FENCE, ApplyResult, EditBlock, Fence
@@ -380,10 +380,22 @@ Just reply with fixed versions of the {blocks} above that failed to match.
 
 
 def _resolve_path(root_path: Path, path: str | Path) -> Path:
+    resolved_root = root_path.resolve()
     file_path = Path(path)
     if file_path.is_absolute():
-        return file_path
-    return root_path / file_path
+        resolved_path = file_path.resolve()
+    else:
+        resolved_path = (resolved_root / file_path).resolve()
+
+    try:
+        resolved_path.relative_to(resolved_root)
+    except ValueError as exc:
+        raise PathEscapeError(
+            f"Refusing to edit path '{path}' because it resolves outside root "
+            f"'{resolved_root}'."
+        ) from exc
+
+    return resolved_path
 
 
 def _resolve_chat_files(

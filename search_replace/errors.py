@@ -15,6 +15,10 @@ class MissingFilenameError(ParseError):
     pass
 
 
+class PathEscapeError(SearchReplaceError):
+    pass
+
+
 @dataclass(slots=True)
 class ApplyError(SearchReplaceError):
     message: str
