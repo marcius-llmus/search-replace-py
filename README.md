@@ -101,8 +101,9 @@ few_shot = [
 
 agent = Agent("openai:gpt-5.2", instructions=render_system_prompt())
 
+auth_py = Path("auth.py").read_text()
 result = agent.run_sync(
-    "Refactor the login function in auth.py to use bcrypt",
+    f"Refactor the login function in auth.py to use bcrypt.\n\nauth.py\n```python\n{auth_py}\n```",
     message_history=few_shot,
 )
 
