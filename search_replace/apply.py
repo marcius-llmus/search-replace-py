@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Sequence
 
-from .errors import ApplyError
+from .errors import ApplyError, ParseError
 from .fuzzy import find_similar_lines, replace_closest_edit_distance
 from .parser import parse_edit_blocks
 from .types import DEFAULT_FENCE, ApplyResult, EditBlock, Fence
@@ -392,4 +392,6 @@ def apply_diff(
     malformed syntax, and ``ApplyError`` if one or more blocks fail to match.
     """
     result = parse_edit_blocks(llm_response, fence=fence)
+    if not result.edits:
+        raise ParseError("No SEARCH/REPLACE blocks found in the LLM response.")
     return apply_edits(result.edits, root=root, chat_files=chat_files, fence=fence)
