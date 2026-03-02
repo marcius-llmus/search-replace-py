@@ -79,7 +79,6 @@ def replace_most_similar_chunk(whole: str, part: str, replace: str) -> str | Non
     except ValueError:
         pass
 
-    return None
     # Try fuzzy matching.
     result = replace_closest_edit_distance(whole_lines, part, part_lines, replace_lines)
     if result:

@@ -1,6 +1,6 @@
 [project]
 name = "search-replace-py"
-version = "0.0.1"
+version = "0.0.2"
 description = "Parse and apply Aider-style SEARCH/REPLACE patch blocks to files"
 readme = "README.md"
 requires-python = ">=3.14"

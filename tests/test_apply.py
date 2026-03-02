@@ -92,6 +92,25 @@ class TestApply(unittest.TestCase):
         result = replace_most_similar_chunk(whole, part, replace)
         self.assertEqual(result, expected_output)
 
+    def test_replace_with_fuzzy_matching(self) -> None:
+        whole = "alpha = 1\nbeta = 2\ngamma = 3\n"
+        part = "beta = 22\n"
+        replace = "beta = 200\n"
+        expected_output = "alpha = 1\nbeta = 200\ngamma = 3\n"
+
+        result = replace_most_similar_chunk(whole, part, replace)
+
+        self.assertEqual(result, expected_output)
+
+    def test_replace_with_fuzzy_matching_below_threshold_returns_none(self) -> None:
+        whole = "alpha = 1\nbeta = 2\ngamma = 3\n"
+        part = "totally unrelated sentence here\n"
+        replace = "beta = 200\n"
+
+        result = replace_most_similar_chunk(whole, part, replace)
+
+        self.assertIsNone(result)
+
     def test_create_new_file_with_other_file_in_chat(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
